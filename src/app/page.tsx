@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
 import { Copy, Check, CreditCard, Smartphone, Users, TrendingUp, Clock, Shield, Star, Zap, Target, Award, Globe, ChevronDown } from 'lucide-react';
 
 export default function CheckoutPage() {
@@ -207,7 +206,9 @@ export default function CheckoutPage() {
   // CHAVE PIX ALTERADA PARA CNPJ
   const pixKey = '53.703.017/0001-71';
   const pixValue = '297.00';
-  const pixString = `00020126580014br.gov.bcb.pix0136537030170001715204000053039865405297.0062070503***6304`;
+
+  // Link do Infinit Pay para pagamento com cartão
+  const infinitPayLink = 'https://invoice.infinitepay.io/plans/ismael-barbosa-pereira/2f4rog5lP';
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -249,6 +250,11 @@ export default function CheckoutPage() {
     } else {
       setCardData(prev => ({ ...prev, [field]: value }));
     }
+  };
+
+  // Função para redirecionar para o Infinit Pay
+  const handleCardPayment = () => {
+    window.open(infinitPayLink, '_blank');
   };
 
   const handleSubmit = async () => {
@@ -582,7 +588,11 @@ export default function CheckoutPage() {
                   </button>
 
                   <button
-                    onClick={() => setPaymentMethod('card')}
+                    onClick={() => {
+                      setPaymentMethod('card');
+                      // Redirecionar automaticamente para o Infinit Pay
+                      handleCardPayment();
+                    }}
                     className={`p-4 sm:p-6 rounded-xl border-2 transition-all duration-300 ${
                       paymentMethod === 'card'
                         ? 'border-orange-500 bg-orange-50'
@@ -611,63 +621,49 @@ export default function CheckoutPage() {
                         Com PIX, seu bônus de US$ 40 é creditado IMEDIATAMENTE na sua conta Deriv após a confirmação!
                       </p>
                       
-                      <div className="grid gap-6 lg:grid-cols-2">
-                        <div className="text-center order-2 lg:order-1">
-                          <div className="bg-white p-3 sm:p-4 rounded-xl inline-block shadow-lg">
-                            <QRCodeSVG 
-                              value={pixString}
-                              size={window.innerWidth < 640 ? 160 : 200}
-                              level="M"
-                              includeMargin={true}
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Chave PIX (CNPJ)
+                          </label>
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="text"
+                              value={pixKey}
+                              readOnly
+                              className="flex-1 px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-xl bg-gray-50 text-sm sm:text-base"
                             />
+                            <button
+                              onClick={() => copyToClipboard(pixKey)}
+                              className="px-3 py-2 sm:px-4 sm:py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors"
+                            >
+                              {copied ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : <Copy className="w-4 h-4 sm:w-5 sm:h-5" />}
+                            </button>
                           </div>
-                          <p className="text-xs sm:text-sm text-gray-600 mt-2">Escaneie com seu banco</p>
                         </div>
                         
-                        <div className="space-y-4 order-1 lg:order-2">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Chave PIX (CNPJ)
-                            </label>
-                            <div className="flex items-center space-x-2">
-                              <input
-                                type="text"
-                                value={pixKey}
-                                readOnly
-                                className="flex-1 px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-xl bg-gray-50 text-sm sm:text-base"
-                              />
-                              <button
-                                onClick={() => copyToClipboard(pixKey)}
-                                className="px-3 py-2 sm:px-4 sm:py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors"
-                              >
-                                {copied ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : <Copy className="w-4 h-4 sm:w-5 sm:h-5" />}
-                              </button>
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Valor
-                            </label>
-                            <input
-                              type="text"
-                              value={`R$ ${pixValue}`}
-                              readOnly
-                              className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-xl bg-gray-50 text-sm sm:text-base"
-                            />
-                          </div>
-                          
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Beneficiário
-                            </label>
-                            <input
-                              type="text"
-                              value="Ismael Barbosa Pereira"
-                              readOnly
-                              className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-xl bg-gray-50 text-sm sm:text-base"
-                            />
-                          </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Valor
+                          </label>
+                          <input
+                            type="text"
+                            value={`R$ ${pixValue}`}
+                            readOnly
+                            className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-xl bg-gray-50 text-sm sm:text-base"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Beneficiário
+                          </label>
+                          <input
+                            type="text"
+                            value="Ismael Barbosa Pereira"
+                            readOnly
+                            className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-xl bg-gray-50 text-sm sm:text-base"
+                          />
                         </div>
                       </div>
                     </div>
@@ -697,6 +693,29 @@ export default function CheckoutPage() {
 
                 {paymentMethod === 'card' && (
                   <div className="space-y-6">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 sm:p-6">
+                      <div className="flex items-center space-x-3 mb-4">
+                        <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                        <h3 className="font-bold text-blue-800 text-sm sm:text-base">Pagamento com Cartão - Infinit Pay</h3>
+                      </div>
+                      <p className="text-blue-700 mb-4 text-sm sm:text-base">
+                        Você será redirecionado para o Infinit Pay para finalizar seu pagamento de forma segura.
+                      </p>
+                      
+                      <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 mb-4">
+                        <p className="text-blue-800 font-bold text-sm sm:text-base">
+                          💳 Valor: R$ 297,00 (já configurado no link)
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={handleCardPayment}
+                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-4 px-6 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg"
+                      >
+                        🚀 Pagar com Cartão - R$ 297,00
+                      </button>
+                    </div>
+
                     <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
                       <div className="flex items-center space-x-2">
                         <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
@@ -705,75 +724,6 @@ export default function CheckoutPage() {
                         </span>
                       </div>
                     </div>
-
-                    <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
-                      <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Número do Cartão
-                        </label>
-                        <input
-                          type="text"
-                          value={cardData.number}
-                          onChange={(e) => handleCardInputChange('number', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
-                          placeholder="0000 0000 0000 0000"
-                          maxLength={19}
-                        />
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Nome no Cartão
-                        </label>
-                        <input
-                          type="text"
-                          value={cardData.name}
-                          onChange={(e) => handleCardInputChange('name', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
-                          placeholder="Nome como no cartão"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Validade
-                        </label>
-                        <input
-                          type="text"
-                          value={cardData.expiry}
-                          onChange={(e) => handleCardInputChange('expiry', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
-                          placeholder="MM/AA"
-                          maxLength={5}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          CVV
-                        </label>
-                        <input
-                          type="text"
-                          value={cardData.cvv}
-                          onChange={(e) => handleCardInputChange('cvv', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
-                          placeholder="000"
-                          maxLength={4}
-                        />
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={handleSubmit}
-                      disabled={processing || !cardData.number || !cardData.name || !cardData.expiry || !cardData.cvv}
-                      className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 px-6 rounded-xl font-semibold text-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-                    >
-                      {processing ? (
-                        <div className="flex items-center justify-center space-x-2">
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          <span>Processando...</span>
-                        </div>
-                      ) : (
-                        `Finalizar Pagamento - R$ ${pixValue}`
-                      )}
-                    </button>
 
                     <div className="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-6">
                       <div className="flex items-start space-x-3">
